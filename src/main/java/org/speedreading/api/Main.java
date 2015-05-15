@@ -71,7 +71,7 @@ public class Main {
         for (String word : words) {
             while (word.length() > 13) {
                 ret.add(word.substring(0, 11) + "-");
-                word = word.substring(12);
+                word = word.substring(11);
             }
 
             ret.add(word);
