@@ -1,12 +1,5 @@
 package org.speedreading.api;
 
-import com.sun.org.apache.bcel.internal.util.ByteSequence;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -22,9 +15,8 @@ public class Main {
     public static ArrayList<WordORP> convertToSpeedreadingText(String pText) {
 
         ArrayList<WordORP> ret = new ArrayList<>();
-        ArrayList<String> words = getSplittedText(pText);
 
-        for (String word : words) {
+        for (String word : getSplitText(pText)) {
             ret.add(new WordORP(word, getORP(word)));
         }
 
@@ -65,7 +57,7 @@ public class Main {
         return orp;
     }
 
-    private static ArrayList<String> getSplittedText(String pText) {
+    private static ArrayList<String> getSplitText(String pText) {
 
         String[] words = pText.split(" ");
         ArrayList<String> ret = new ArrayList<>();
@@ -78,10 +70,10 @@ public class Main {
 
                 // Prevents short word endings (i.e. let- ters. instead of letter- s.)
                 String temp = word.substring(11);
-                if(temp.length() < 4) {
-                    if(!(consonants.contains(temp.charAt(temp.length()-1)) || vowels.contains(temp.charAt(temp.length()-1)))) {
+                if (temp.length() < 4) {
+                    if (!(consonants.contains(temp.charAt(temp.length() - 1)) || vowels.contains(temp.charAt(temp.length() - 1)))) {
                         i--;
-                        j --;
+                        j--;
                     }
                     i--;
                     j--;
