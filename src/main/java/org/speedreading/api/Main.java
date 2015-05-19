@@ -17,7 +17,7 @@ public class Main {
     private static List<String> consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
     private static List<String> vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
     private static List<String> dontSplit2 = Arrays.asList("sh", "ch", "ck", "ph", "rh", "th", "ai", "au", "ei", "eu", "oi", "ae", "oe", "ue", "äu");
-    private static List<String> dontSplit3 = Arrays.asList("sch");
+    private static List<String> dontSplit3 = Arrays.asList("sch", "ing", "ung");
 
     public static ArrayList<WordORP> convertToSpeedreadingText(String pText) {
 
@@ -73,7 +73,21 @@ public class Main {
         for (String word : words) {
             while (word.length() > 13) {
 
-                for (int i = 11, j = 12; i >= 0; i--, j--) {
+                int i = 11,
+                        j = 12;
+
+                // Prevents short word endings (i.e. let- ters. instead of letter- s.)
+                String temp = word.substring(11);
+                if(temp.length() < 4) {
+                    if(!(consonants.contains(temp.charAt(temp.length()-1)) || vowels.contains(temp.charAt(temp.length()-1)))) {
+                        i--;
+                        j --;
+                    }
+                    i--;
+                    j--;
+                }
+
+                for (; i >= 0; i--, j--) {
 
                     // No good point to split found
                     if (i == 0) {
@@ -124,9 +138,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String test = "Das ist jetzt einfach mal so ein kleiner Test, zur Überprüfung dieser API und zur Sicherheit schreiben wir noch ein ziemlich langes Wort rein wie z.B.: Dampffahrtschiffahrtsgesellschaftsangestellter";
-        String test2 = "Dampffahrtschiffahrtsgesellschaft Zusammentreffen Essensgewohnheiten Dampffahrtschifffahrtsgesellschaft";
-        for(WordORP entry : Main.convertToSpeedreadingText(test2)) {
+        String test = "Dampfschiffers. Dampfschiffers Dampffahrtschiffahrtsgesellschaft Zusammentreffen, Essensgewohnheiten... Dampffahrtschifffahrtsgesellschaft.";
+        for (WordORP entry : Main.convertToSpeedreadingText(test)) {
             System.out.println(entry.getWord() + " : " + entry.getOrp());
         }
     }
