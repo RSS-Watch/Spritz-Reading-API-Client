@@ -7,15 +7,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Andrej on 15.05.2015.
  */
 public class Main {
+
+    private static List<String> consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
+    private static List<String> vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
+    private static List<String> dontSplit2 = Arrays.asList("sh", "ch", "ck", "ph", "rh", "th", "ai", "au", "ei", "eu", "oi", "ae", "oe", "ue", "äu");
+    private static List<String> dontSplit3 = Arrays.asList("sch");
 
     public static LinkedHashMap<String, Integer> convertToSpeedreadingText(String pText) {
 
@@ -70,8 +72,48 @@ public class Main {
 
         for (String word : words) {
             while (word.length() > 13) {
-                ret.add(word.substring(0, 11) + "-");
-                word = word.substring(11);
+
+                for (int i = 11, j = 12; i >= 0; i--, j--) {
+
+                    // No good point to split found
+                    if (i == 0) {
+                        ret.add(word.substring(0, 11) + "-");
+                        word = word.substring(11);
+                        break;
+                    }
+
+                    if (dontSplit3.contains("" + word.charAt(i - 1) + word.charAt(i) + word.charAt(j))) {
+                        if (i > 1) {
+                            i--;
+                            j--;
+                            continue;
+                        } else {
+                            ret.add(word.substring(0, 11) + "-");
+                            word = word.substring(11);
+                            break;
+                        }
+                    }
+
+                    if (dontSplit2.contains("" + word.charAt(i) + word.charAt(j))) {
+                        continue;
+                    }
+
+                    // Split if letters duplicate
+                    if (word.charAt(i) == word.charAt(j)) {
+                        ret.add(word.substring(0, j) + "-");
+                        word = word.substring(j);
+                        break;
+                    }
+
+                    // Split between two consonants
+                    if (consonants.contains("" + word.charAt(i)) && consonants.contains("" + word.charAt(j))) {
+                        ret.add(word.substring(0, j) + "-");
+                        word = word.substring(j);
+                        break;
+                    }
+
+                }
+
             }
 
             ret.add(word);
@@ -82,9 +124,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String test = "Das ist jetzt einfach mal so ein kleiner Test, zur Überprüfung dieser API und zur Sicherheit schreiben wir noch ein ziemlich langes Wort rein wie z.B.: Dampfahrtschifffahrtsgesellschaftsangestellter";
-
-        for (Map.Entry<String, Integer> entry : Main.convertToSpeedreadingText(test).entrySet()) {
+        String test = "Das ist jetzt einfach mal so ein kleiner Test, zur Überprüfung dieser API und zur Sicherheit schreiben wir noch ein ziemlich langes Wort rein wie z.B.: Dampffahrtschiffahrtsgesellschaftsangestellter";
+        String test2 = "Dampffahrtschiffahrtsgesellschaft Zusammentreffen Essensgewohnheiten";
+        for (Map.Entry<String, Integer> entry : Main.convertToSpeedreadingText(test2).entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue());
         }
     }
