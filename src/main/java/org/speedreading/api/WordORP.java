@@ -12,11 +12,11 @@ public class WordORP {
         this.orp = porp;
     }
 
-    public String getWordrd() {
+    public String getWord() {
         return word;
     }
 
-    public void setWordrd(String pword) {
+    public void setWord(String pword) {
         this.word = pword;
     }
 

@@ -19,13 +19,13 @@ public class Main {
     private static List<String> dontSplit2 = Arrays.asList("sh", "ch", "ck", "ph", "rh", "th", "ai", "au", "ei", "eu", "oi", "ae", "oe", "ue", "äu");
     private static List<String> dontSplit3 = Arrays.asList("sch");
 
-    public static LinkedHashMap<String, Integer> convertToSpeedreadingText(String pText) {
+    public static ArrayList<WordORP> convertToSpeedreadingText(String pText) {
 
-        LinkedHashMap<String, Integer> ret = new LinkedHashMap<>();
+        ArrayList<WordORP> ret = new ArrayList<>();
         ArrayList<String> words = getSplittedText(pText);
 
         for (String word : words) {
-            ret.put(word, getORP(word));
+            ret.add(new WordORP(word, getORP(word)));
         }
 
         return ret;
@@ -125,9 +125,9 @@ public class Main {
     public static void main(String[] args) {
 
         String test = "Das ist jetzt einfach mal so ein kleiner Test, zur Überprüfung dieser API und zur Sicherheit schreiben wir noch ein ziemlich langes Wort rein wie z.B.: Dampffahrtschiffahrtsgesellschaftsangestellter";
-        String test2 = "Dampffahrtschiffahrtsgesellschaft Zusammentreffen Essensgewohnheiten";
-        for (Map.Entry<String, Integer> entry : Main.convertToSpeedreadingText(test2).entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+        String test2 = "Dampffahrtschiffahrtsgesellschaft Zusammentreffen Essensgewohnheiten Dampffahrtschifffahrtsgesellschaft";
+        for(WordORP entry : Main.convertToSpeedreadingText(test2)) {
+            System.out.println(entry.getWord() + " : " + entry.getOrp());
         }
     }
 }
