@@ -1,6 +1,8 @@
 package org.speedreading.api;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Andrej on 15.05.2015.
