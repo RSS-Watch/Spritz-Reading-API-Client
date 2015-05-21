@@ -1,29 +1,28 @@
 package org.speedreading.api;
 
-import com.sun.org.apache.bcel.internal.util.ByteSequence;
-
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Andrej on 15.05.2015.
  */
 public class Main {
 
-    public static LinkedHashMap<String, Integer> convertToSpeedreadingText(String pText) {
+    private static List<String> consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
+    private static List<String> vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
+    private static List<String> twoLetterSyllables = getListFrom("twoLetterSyllables.data");
+    private static List<String> threeLetterSyllables = getListFrom("threeLetterSyllables.data");
 
-        LinkedHashMap<String, Integer> ret = new LinkedHashMap<>();
-        ArrayList<String> words = getSplittedText(pText);
+    public static ArrayList<WordORP> convertToSpeedReadingText(String pText) {
 
-        for (String word : words) {
-            ret.put(word, getORP(word));
+        ArrayList<WordORP> ret = new ArrayList<>();
+
+        for (String word : getSplitText(pText)) {
+            ret.add(new WordORP(word, getORP(word)));
         }
 
         return ret;
@@ -63,15 +62,69 @@ public class Main {
         return orp;
     }
 
-    private static ArrayList<String> getSplittedText(String pText) {
+    private static ArrayList<String> getSplitText(String pText) {
 
         String[] words = pText.split(" ");
         ArrayList<String> ret = new ArrayList<>();
 
         for (String word : words) {
             while (word.length() > 13) {
-                ret.add(word.substring(0, 11) + "-");
-                word = word.substring(12);
+
+                int i = 11,
+                        j = 12;
+
+                // Prevents short word endings (i.e. "let- ters." instead of "letter- s.")
+                String temp = word.substring(11);
+                if (temp.length() < 4) {
+                    if (!(consonants.contains(temp.charAt(temp.length() - 1)) || vowels.contains(temp.charAt(temp.length() - 1)))) {
+                        i--;
+                        j--;
+                    }
+                    i--;
+                    j--;
+                }
+
+                for (; i >= 0; i--, j--) {
+
+                    // No good point to split found
+                    if (i == 0) {
+                        ret.add(word.substring(0, 11) + "-");
+                        word = word.substring(11);
+                        break;
+                    }
+
+                    if (threeLetterSyllables.contains("" + word.charAt(i - 1) + word.charAt(i) + word.charAt(j))) {
+                        if (i > 1) {
+                            i--;
+                            j--;
+                            continue;
+                        } else {
+                            ret.add(word.substring(0, 11) + "-");
+                            word = word.substring(11);
+                            break;
+                        }
+                    }
+
+                    if (twoLetterSyllables.contains("" + word.charAt(i) + word.charAt(j))) {
+                        continue;
+                    }
+
+                    // Split if letters duplicate
+                    if (word.charAt(i) == word.charAt(j)) {
+                        ret.add(word.substring(0, j) + "-");
+                        word = word.substring(j);
+                        break;
+                    }
+
+                    // Split between two consonants
+                    if (consonants.contains("" + word.charAt(i)) && consonants.contains("" + word.charAt(j))) {
+                        ret.add(word.substring(0, j) + "-");
+                        word = word.substring(j);
+                        break;
+                    }
+
+                }
+
             }
 
             ret.add(word);
@@ -80,12 +133,34 @@ public class Main {
         return ret;
     }
 
+    private static ArrayList<String> getListFrom(String pFile) {
+
+        ArrayList<String> retList = new ArrayList<>();
+
+        try {
+
+            BufferedReader in = new BufferedReader(new FileReader(pFile));
+            String line;
+
+            while ((line = in.readLine()) != null)
+                retList.add(line);
+
+            in.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return retList;
+
+    }
+
     public static void main(String[] args) {
 
-        String test = "Das ist jetzt einfach mal so ein kleiner Test, zur Überprüfung dieser API und zur Sicherheit schreiben wir noch ein ziemlich langes Wort rein wie z.B.: Dampfahrtschifffahrtsgesellschaftsangestellter";
-
-        for (Map.Entry<String, Integer> entry : Main.convertToSpeedreadingText(test).entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+        String test = "Dampfschiffers. Dampfschiffers Dampffahrtschiffahrtsgesellschaft Zusammentreffen, Essensgewohnheiten... Dampffahrtschifffahrtsgesellschaft.";
+        for (WordORP entry : Main.convertToSpeedReadingText(test)) {
+            System.out.println(entry.getWord() + " : " + entry.getOrp());
         }
+
     }
 }
