@@ -1,5 +1,8 @@
 package org.speedreading.api;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,10 +14,10 @@ public class Main {
 
     private static List<String> consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
     private static List<String> vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
-    private static List<String> dontSplit2 = Arrays.asList("sh", "ch", "ck", "ph", "rh", "th", "ai", "au", "ei", "eu", "oi", "ae", "oe", "ue", "äu");
-    private static List<String> dontSplit3 = Arrays.asList("sch", "ing", "ung");
+    private static List<String> twoLetterSyllables = getListFrom("twoLetterSyllables.data");
+    private static List<String> threeLetterSyllables = getListFrom("threeLetterSyllables.data");
 
-    public static ArrayList<WordORP> convertToSpeedreadingText(String pText) {
+    public static ArrayList<WordORP> convertToSpeedReadingText(String pText) {
 
         ArrayList<WordORP> ret = new ArrayList<>();
 
@@ -70,7 +73,7 @@ public class Main {
                 int i = 11,
                         j = 12;
 
-                // Prevents short word endings (i.e. let- ters. instead of letter- s.)
+                // Prevents short word endings (i.e. "let- ters." instead of "letter- s.")
                 String temp = word.substring(11);
                 if (temp.length() < 4) {
                     if (!(consonants.contains(temp.charAt(temp.length() - 1)) || vowels.contains(temp.charAt(temp.length() - 1)))) {
@@ -90,7 +93,7 @@ public class Main {
                         break;
                     }
 
-                    if (dontSplit3.contains("" + word.charAt(i - 1) + word.charAt(i) + word.charAt(j))) {
+                    if (threeLetterSyllables.contains("" + word.charAt(i - 1) + word.charAt(i) + word.charAt(j))) {
                         if (i > 1) {
                             i--;
                             j--;
@@ -102,7 +105,7 @@ public class Main {
                         }
                     }
 
-                    if (dontSplit2.contains("" + word.charAt(i) + word.charAt(j))) {
+                    if (twoLetterSyllables.contains("" + word.charAt(i) + word.charAt(j))) {
                         continue;
                     }
 
@@ -130,11 +133,34 @@ public class Main {
         return ret;
     }
 
+    private static ArrayList<String> getListFrom(String pFile) {
+
+        ArrayList<String> retList = new ArrayList<>();
+
+        try {
+
+            BufferedReader in = new BufferedReader(new FileReader(pFile));
+            String line;
+
+            while ((line = in.readLine()) != null)
+                retList.add(line);
+
+            in.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return retList;
+
+    }
+
     public static void main(String[] args) {
 
         String test = "Dampfschiffers. Dampfschiffers Dampffahrtschiffahrtsgesellschaft Zusammentreffen, Essensgewohnheiten... Dampffahrtschifffahrtsgesellschaft.";
-        for (WordORP entry : Main.convertToSpeedreadingText(test)) {
+        for (WordORP entry : Main.convertToSpeedReadingText(test)) {
             System.out.println(entry.getWord() + " : " + entry.getOrp());
         }
+
     }
 }
