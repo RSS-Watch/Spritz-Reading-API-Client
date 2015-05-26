@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by Andrej on 15.05.2015.
+ * This class can be used for formatting texts and calculating the Optimal Recognition Points of words.
+ *
+ * @author Andrej Schäfer
+ * @author Julian Sauer
  */
 public class SpeedReadingAPI {
 
@@ -25,6 +28,12 @@ public class SpeedReadingAPI {
 
     }
 
+    /**
+     * Calculates the Optimal Recognition Point for a given String.
+     *
+     * @param pWord String that resembles a word.
+     * @return ORP of the word.
+     */
     private static Integer getORP(String pWord) {
 
         int length = pWord.length();
@@ -59,6 +68,12 @@ public class SpeedReadingAPI {
         return orp;
     }
 
+    /**
+     * Converts a given text into an ArrayList containing single words and their Optimal Recognition Points.
+     *
+     * @param pText Text that shall be converted.
+     * @return ArrayList containing WordORP objects.
+     */
     public ArrayList<WordORP> convertToSpeedReadingText(String pText) {
 
         ArrayList<WordORP> ret = new ArrayList<>();
@@ -70,6 +85,12 @@ public class SpeedReadingAPI {
         return ret;
     }
 
+    /**
+     * Formats the text by splitting the words into Strings that have 13 or less characters.
+     *
+     * @param pText Text that shall be formatted.
+     * @return ArrayList containing the split words.
+     */
     private ArrayList<String> getSplitText(String pText) {
 
         String[] words = pText.split(" ");
@@ -141,6 +162,12 @@ public class SpeedReadingAPI {
         return ret;
     }
 
+    /**
+     * Loads a list of Strings that shouldn't be split from the resource directory.
+     *
+     * @param pFileName Name of the file.
+     * @return ArrayList containing the loaded Strings.
+     */
     private ArrayList<String> getListFrom(String pFileName) {
 
         ArrayList<String> retList = new ArrayList<>();
