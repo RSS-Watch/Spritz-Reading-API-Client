@@ -1,7 +1,10 @@
 package org.speedreading.api;
 
 /**
- * Created by Andrej on 19.05.2015.
+ * String-Integer pair to store a word with it's Optimal Recognition Point.
+ *
+ * @author Andrej Schäfer
+ * @author Julian Sauer
  */
 public class WordORP {
     private String word;

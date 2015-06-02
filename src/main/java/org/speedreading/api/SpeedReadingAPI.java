@@ -1,33 +1,39 @@
 package org.speedreading.api;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
- * Created by Andrej on 15.05.2015.
+ * This class can be used for formatting texts and calculating the Optimal Recognition Points of words.
+ *
+ * @author Andrej Schäfer
+ * @author Julian Sauer
  */
-public class Main {
+public class SpeedReadingAPI {
 
-    private static List<String> consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
-    private static List<String> vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
-    private static List<String> twoLetterSyllables = getListFrom("twoLetterSyllables.data");
-    private static List<String> threeLetterSyllables = getListFrom("threeLetterSyllables.data");
+    private List<String> consonants;
+    private List<String> vowels;
+    private List<String> twoLetterSyllables;
+    private List<String> threeLetterSyllables;
 
-    public static ArrayList<WordORP> convertToSpeedReadingText(String pText) {
+    public SpeedReadingAPI() {
 
-        ArrayList<WordORP> ret = new ArrayList<>();
+        consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
+        vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
+        twoLetterSyllables = getListFrom("/twoLetterSyllables.data");
+        threeLetterSyllables = getListFrom("/threeLetterSyllables.data");
 
-        for (String word : getSplitText(pText)) {
-            ret.add(new WordORP(word, getORP(word)));
-        }
-
-        return ret;
     }
 
+    /**
+     * Calculates the Optimal Recognition Point for a given String.
+     *
+     * @param pWord String that resembles a word.
+     * @return ORP of the word.
+     */
     private static Integer getORP(String pWord) {
 
         int length = pWord.length();
@@ -62,7 +68,30 @@ public class Main {
         return orp;
     }
 
-    private static ArrayList<String> getSplitText(String pText) {
+    /**
+     * Converts a given text into an ArrayList containing single words and their Optimal Recognition Points.
+     *
+     * @param pText Text that shall be converted.
+     * @return ArrayList containing WordORP objects.
+     */
+    public ArrayList<WordORP> convertToSpeedReadingText(String pText) {
+
+        ArrayList<WordORP> ret = new ArrayList<>();
+
+        for (String word : getSplitText(pText)) {
+            ret.add(new WordORP(word, getORP(word)));
+        }
+
+        return ret;
+    }
+
+    /**
+     * Formats the text by splitting the words into Strings that have 13 or less characters.
+     *
+     * @param pText Text that shall be formatted.
+     * @return ArrayList containing the split words.
+     */
+    private ArrayList<String> getSplitText(String pText) {
 
         String[] words = pText.split(" ");
         ArrayList<String> ret = new ArrayList<>();
@@ -133,34 +162,23 @@ public class Main {
         return ret;
     }
 
-    private static ArrayList<String> getListFrom(String pFile) {
+    /**
+     * Loads a list of Strings that shouldn't be split from the resource directory.
+     *
+     * @param pFileName Name of the file.
+     * @return ArrayList containing the loaded Strings.
+     */
+    private ArrayList<String> getListFrom(String pFileName) {
 
         ArrayList<String> retList = new ArrayList<>();
 
-        try {
-
-            BufferedReader in = new BufferedReader(new FileReader(pFile));
-            String line;
-
-            while ((line = in.readLine()) != null)
-                retList.add(line);
-
-            in.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        InputStream in = this.getClass().getResourceAsStream(pFileName);
+        Scanner s = new Scanner(in);
+        while (s.hasNext()) {
+            retList.add(s.next());
         }
 
         return retList;
-
-    }
-
-    public static void main(String[] args) {
-
-        String test = "Dampfschiffers. Dampfschiffers Dampffahrtschiffahrtsgesellschaft Zusammentreffen, Essensgewohnheiten... Dampffahrtschifffahrtsgesellschaft.";
-        for (WordORP entry : Main.convertToSpeedReadingText(test)) {
-            System.out.println(entry.getWord() + " : " + entry.getOrp());
-        }
 
     }
 }
