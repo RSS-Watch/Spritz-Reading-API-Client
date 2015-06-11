@@ -1,5 +1,6 @@
 package org.speedreading.api;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ public class SpeedReadingAPI {
      * @param pWord String that resembles a word.
      * @return ORP of the word.
      */
-    private static Integer getORP(String pWord) {
+    private Integer getORP(String pWord) {
 
         int length = pWord.length();
         int orp;
@@ -72,13 +73,15 @@ public class SpeedReadingAPI {
      * @param pText Text that shall be converted.
      * @return ArrayList containing WordORP objects.
      */
-    public ArrayList<WordORP> convertToSpeedReadingText(String pText) {
+    public ArrayDeque<WordORP> convertToSpeedReadingText(String pText) {
 
-        ArrayList<WordORP> ret = new ArrayList<>();
+        ArrayDeque<WordORP> ret = new ArrayDeque<>();
 
         for (String word : getSplitText(pText)) {
             ret.add(new WordORP(word, getORP(word)));
         }
+
+        addSpaces(ret);
 
         return ret;
     }
@@ -160,20 +163,14 @@ public class SpeedReadingAPI {
         return ret;
     }
 
-    /**
-     * Converts an ArrayList of Word-ORP pairs to a String array of words
-     *
-     * @param pArrayList List that shall be converted
-     * @return String array containing the words from the ArrayList
-     */
-    public String[] convertToStringArray(ArrayList<WordORP> pArrayList) {
-        int length = pArrayList.size();
-        String[] ret = new String[length];
+    private void addSpaces(ArrayDeque<WordORP> pArrayDeque) {
 
-        for (int i = 0; i < length; i++)
-            ret[i] = pArrayList.get(i).getWord();
+        for (WordORP wop : pArrayDeque) {
+            for (int i = 1; i < 4 - wop.getOrp(); i++) {
+                wop.setWord(" " + wop.getWord());
+            }
+        }
 
-        return ret;
     }
 
 }
