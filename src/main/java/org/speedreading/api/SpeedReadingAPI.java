@@ -1,10 +1,8 @@
 package org.speedreading.api;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * This class can be used for formatting texts and calculating the Optimal Recognition Points of words.
@@ -23,8 +21,8 @@ public class SpeedReadingAPI {
 
         consonants = Arrays.asList("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß");
         vowels = Arrays.asList("a", "e", "i", "o", "u", "ä", "ö", "ü");
-        twoLetterSyllables = getListFrom("/twoLetterSyllables.data");
-        threeLetterSyllables = getListFrom("/threeLetterSyllables.data");
+        twoLetterSyllables = Arrays.asList("sh", "ch", "ck", "ph", "rh", "th", "ai", "au", "ei", "eu", "oi", "ae", "oe", "ue", "äu");
+        threeLetterSyllables = Arrays.asList("sch", "ing", "ung");
 
     }
 
@@ -163,22 +161,19 @@ public class SpeedReadingAPI {
     }
 
     /**
-     * Loads a list of Strings that shouldn't be split from the resource directory.
+     * Converts an ArrayList of Word-ORP pairs to a String array of words
      *
-     * @param pFileName Name of the file.
-     * @return ArrayList containing the loaded Strings.
+     * @param pArrayList List that shall be converted
+     * @return String array containing the words from the ArrayList
      */
-    private ArrayList<String> getListFrom(String pFileName) {
+    public String[] convertToStringArray(ArrayList<WordORP> pArrayList) {
+        int length = pArrayList.size();
+        String[] ret = new String[length];
 
-        ArrayList<String> retList = new ArrayList<>();
+        for (int i = 0; i < length; i++)
+            ret[i] = pArrayList.get(i).getWord();
 
-        InputStream in = this.getClass().getResourceAsStream(pFileName);
-        Scanner s = new Scanner(in);
-        while (s.hasNext()) {
-            retList.add(s.next());
-        }
-
-        return retList;
-
+        return ret;
     }
+
 }
